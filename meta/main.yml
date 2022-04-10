@@ -1,0 +1,5 @@
+---
+
+dependencies:
+  # https://codeberg.org/ansible/java-openjdk
+  - { role: java-openjdk, become: true, tags: java-openjdk }

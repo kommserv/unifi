@@ -1,0 +1,16 @@
+---
+
+- name: Install dependencies for Unifi (except for Java and Mongo)
+  ansible.builtin.apt:
+    name: 
+      - binutils
+      - coreutils
+      - adduser
+      - libcap2
+      - curl
+      - logrotate
+      - binutils
+      - ca-certificates
+      - apt-transport-https
+      - haveged
+    state: present

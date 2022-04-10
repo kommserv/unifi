@@ -1,0 +1,14 @@
+---
+
+# note, dpkg_selections does not support array in name parameter
+# note, character '*' not allowed (only letters, digits and characters '-+._')"
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/dpkg_selections_module.html
+- name: Hold at Java version 8
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+    - "openjdk-{{ java_version | trim }}-jdk"
+    - "openjdk-{{ java_version | trim }}-jdk-headless"
+    - "openjdk-{{ java_version | trim }}-jre"
+    - "openjdk-{{ java_version | trim }}-jre-headless"

@@ -1,0 +1,11 @@
+---
+
+# only install Unifi for hosts that have unifi_controller set to true
+- name: Only for hosts with unifi_controller variable
+  when: unifi_controller is defined and unifi_controller | bool
+  block:
+    - ansible.builtin.import_tasks: java.yml
+    - ansible.builtin.import_tasks: mongodb.yml
+    - ansible.builtin.import_tasks: dependencies.yml
+    - ansible.builtin.include_tasks: "unifi-{{ ansible_architecture }}.yml"
+  # END OF BLOCK

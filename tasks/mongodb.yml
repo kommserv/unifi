@@ -1,0 +1,15 @@
+---
+
+# Ubuntu Focal repos contain MongoDB v3.6.9
+- name: Install MongoDB
+  ansible.builtin.apt:
+    name:
+      - mongodb-server
+      - mongo-tools
+    state: present
+
+# just to be safe, let's hold mongodb as well
+- name: Hold mongodb-server
+  ansible.builtin.dpkg_selections:
+    name: mongodb-server
+    selection: hold

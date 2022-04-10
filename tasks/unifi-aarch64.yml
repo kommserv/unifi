@@ -1,0 +1,54 @@
+---
+
+# https://pimylifeup.com/rasberry-pi-unifi/
+# Install better RNG generator (for use by Unifi)
+- name: Install better random-number generator
+  ansible.builtin.apt:
+    name: rng-tools
+    state: present
+
+- name: Uncomment HRNGDEVICE in /etc/default/rng-tools
+  ansible.builtin.lineinfile:
+    path: /etc/default/rng-tools
+    regexp: "^#HRNGDEVICE=/dev/hwrng"
+    line: "HRNGDEVICE=/dev/hwrng"
+    state: present
+  notify: restart rng-tools
+
+# note: this round-about way of installing Unifi is required because
+# Unifi ubuntu repos do not support arm64 architecture
+# check the latest armhf package to figure out the path to the current *.deb
+- name: Grab the latest Unifi armhf package
+  ansible.builtin.get_url:
+    url: http://dl.ubnt.com/unifi/debian/dists/stable/ubiquiti/binary-armhf/Packages.gz
+    dest: /tmp/Packages.gz
+
+- name: Extract the relative path to the latest Unifi deb-file from package
+  ansible.builtin.shell: zcat /tmp/Packages.gz | awk '/deb$/{print $2}'
+  register: unifi_deb_relpath
+  args:
+    warn: false
+
+- name: Extract the version of the latest Unifi deb-file from package
+  ansible.builtin.shell: zcat /tmp/Packages.gz | awk '/^Version/{print $2}'
+  register: unifi_deb_version
+  args:
+    warn: false
+
+- name: Extract the SHA256 hash of the latest Unifi deb-file from package
+  ansible.builtin.shell: zcat /tmp/Packages.gz | awk '/^SHA256/{print $2}'
+  register: unifi_deb_sha256sum
+  args:
+    warn: false
+
+# checksum verifies the integrity of the package by comparing sha256sums
+- name: "Download Unifi deb http://dl.ubnt.com/unifi/debian/{{ unifi_deb_relpath.stdout }}"
+  ansible.builtin.get_url:
+    url: "http://dl.ubnt.com/unifi/debian/{{ unifi_deb_relpath.stdout }}"
+    dest: "/var/cache/apt/archives/unifi-{{ unifi_deb_version.stdout }}.deb"
+    checksum: "sha256:{{ unifi_deb_sha256sum.stdout }}"
+
+# note: there is no need to "hold" unifi as long as we don't use apt to install it
+- name: "Install Unifi v{{ unifi_deb_version.stdout }} from deb-file"
+  ansible.builtin.apt:
+    deb: "/var/cache/apt/archives/unifi-{{ unifi_deb_version.stdout }}.deb"

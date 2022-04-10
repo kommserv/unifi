@@ -1,0 +1,6 @@
+---
+
+# to update unifi installation (I suggest overriding this var using --extra-vars)
+unifi_update: false
+# Java 9 and later are not yet supported by Unifi
+java_version: '8'

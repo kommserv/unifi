@@ -1,0 +1,21 @@
+---
+
+- name: Add UBNT Unifi repo key
+  ansible.builtin.apt_key:
+    url: https://dl.ui.com/unifi/unifi-repo.gpg
+
+# - name: Add UBNT Unifi repo key
+#   ansible.builtin.apt_key:
+#     keyserver: "hkp://keyserver.ubuntu.com"
+#     id: "06E85760C0A52C50"
+#     state: present
+
+- name: Add UBNT Unifi repository
+  ansible.builtin.apt_repository:
+    repo: "deb https://www.ui.com/downloads/unifi/debian stable ubiquiti"
+    filename: ubnt-unifi
+    state: present
+
+- name: Install Unifi
+  ansible.builtin.apt:
+    name: unifi

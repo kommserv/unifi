@@ -1,0 +1,6 @@
+---
+
+- name: restart rng-tools
+  ansible.builtin.service:
+    name: rng-tools
+    state: restarted
